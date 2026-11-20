@@ -1,6 +1,6 @@
 // Passwordless authentication through Supabase Auth. The public anon key is
 // sufficient for signInWithOtp; the service-role key must never be needed here.
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 import { AppError } from '@/lib/errors/app-error';
 import { logger } from '@/lib/logging/logger';
@@ -47,7 +47,7 @@ export class MagicLinkService {
 }
 
 class SupabaseMagicLinkSender implements MagicLinkSender {
-  private readonly supabase;
+  private readonly supabase: SupabaseClient;
 
   constructor() {
     if (!env.NEXT_PUBLIC_SUPABASE_URL || !env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
