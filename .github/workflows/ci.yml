@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    name: Verify (typecheck + lint + test + db:lint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run verify
+
+  coverage:
+    name: Test coverage
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:coverage
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ github.sha }}
+          path: coverage/
+          retention-days: 14
+
+  build:
+    name: Production build
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          # Placeholder envs so the production build can compile.
+          # Real values are configured in the deployment provider.
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+          SUPABASE_SERVICE_ROLE_KEY: placeholder
+          ANTHROPIC_API_KEY: placeholder
+          STRIPE_SECRET_KEY: placeholder
+          STRIPE_WEBHOOK_SECRET: placeholder
+          WHATSAPP_VERIFY_TOKEN: placeholder
+          WHATSAPP_APP_SECRET: placeholder
+          WHATSAPP_ACCESS_TOKEN: placeholder
+          ELEVENLABS_API_KEY: placeholder
+          UPSTASH_REDIS_REST_URL: https://placeholder.upstash.io
+          UPSTASH_REDIS_REST_TOKEN: placeholder
+          INTERNAL_JOB_SECRET: placeholder
+          WHATSAPP_WEBHOOK_HEADER_SECRET: placeholder
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    needs: verify
+    # NON bloccante per ora. La suite è nuova e non è ancora stata osservata su
+    # esecuzioni reali in CI: non possiamo dichiararne la stabilità, e un job
+    # rosso per rumore insegna a ignorare i job rossi.
+    #
+    # Renderlo bloccante — cioè cancellare questa riga `continue-on-error` —
+    # quando sarà passato verde su almeno 10 PR consecutive senza consumare
+    # retry. Se un test si rivela instabile prima di allora, si corregge o si
+    # elimina quel test: non si allunga l'attesa.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Solo Chromium: la suite verifica redirect, forma delle richieste e
+      # feedback in interfaccia, non differenze di resa fra motori.
+      - run: npx playwright install --with-deps chromium
+      # Nessun segreto. `playwright.config.ts` avvia la build di produzione con
+      # gli stessi segnaposto del job `build`, tranne Upstash: lasciandolo vuoto
+      # il rate limiter ricade in memoria e non tenta chiamate di rete.
+      - run: npm run test:e2e
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.sha }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+  security-scan:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # Bloccante: un gate che non può fallire non è un gate. Se produce falsi
+      # positivi si aggiunge una regola a .gitleaks.toml, non si ignora l'esito.
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  dependency-audit:
+    name: Dependency audit (production)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Solo le dipendenze di produzione: sono quelle che finiscono in
+      # runtime. Il grafo di sviluppo contiene vulnerabilità in strumenti
+      # (ESLint) i cui input sono i nostri stessi file di configurazione, non
+      # input di un attaccante — vedi docs/SECURITY-AUDIT-NOTES.md.
+      - run: npm audit --omit=dev --audit-level=high
