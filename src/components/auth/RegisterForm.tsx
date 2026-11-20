@@ -4,18 +4,18 @@ import { FormFeedback } from '@/components/forms/FormFeedback';
 import { useApiForm } from '@/components/forms/useApiForm';
 
 const VERTICALS = [
-  { value: 'dental', label: 'Studio dentistico' },
-  { value: 'beauty', label: 'Centro estetico / SPA' },
-  { value: 'fitness', label: 'Palestra / personal trainer' },
-  { value: 'professional', label: 'Studio professionale' },
-  { value: 'other', label: 'Altro' },
+  { value: 'dental', label: 'Cabinet dentaire' },
+  { value: 'beauty', label: 'Centre esthétique / SPA' },
+  { value: 'fitness', label: 'Salle de sport / Coach sportif' },
+  { value: 'professional', label: 'Cabinet professionnel' },
+  { value: 'other', label: 'Autre' },
 ] as const;
 
 export function RegisterForm() {
   const { state, onSubmit } = useApiForm({
     endpoint: '/api/auth/sign-up',
     successMessage:
-      'Account creato. Ti abbiamo inviato un link di accesso via email: aprilo per completare la configurazione.',
+      'Demande reçue. Si cette adresse peut être utilisée, vous recevrez un e-mail contenant un lien sécurisé pour poursuivre la création de votre espace.',
   });
 
   const isSubmitting = state.status === 'submitting';
@@ -26,7 +26,7 @@ export function RegisterForm() {
 
       <div className="field">
         <label htmlFor="business_name" className="label">
-          Nome studio o azienda
+          Nom de votre entreprise
         </label>
         <input
           id="business_name"
@@ -36,7 +36,7 @@ export function RegisterForm() {
           required
           minLength={2}
           maxLength={120}
-          placeholder="Studio Dentistico Rossi"
+          placeholder="Cabinet médical, centre esthétique…"
           className="input"
           disabled={isSubmitting}
         />
@@ -44,7 +44,7 @@ export function RegisterForm() {
 
       <div className="field">
         <label htmlFor="email" className="label">
-          Email di lavoro
+          Adresse e-mail professionnelle
         </label>
         <input
           id="email"
@@ -54,19 +54,19 @@ export function RegisterForm() {
           inputMode="email"
           required
           maxLength={254}
-          placeholder="info@studio.it"
+          placeholder="contact@entreprise.tn"
           className="input"
           aria-describedby="register-email-helper"
           disabled={isSubmitting}
         />
         <p className="helper" id="register-email-helper">
-          Useremo questa email per l&apos;account principale del tenant.
+          Cette adresse sera utilisée pour le compte principal de votre espace.
         </p>
       </div>
 
       <div className="field">
         <label htmlFor="vertical" className="label">
-          Settore
+          Votre secteur d’activité
         </label>
         <select
           id="vertical"
@@ -77,7 +77,7 @@ export function RegisterForm() {
           disabled={isSubmitting}
         >
           <option value="" disabled>
-            Seleziona il settore
+            Sélectionnez votre secteur
           </option>
           {VERTICALS.map((vertical) => (
             <option key={vertical.value} value={vertical.value}>
@@ -88,7 +88,7 @@ export function RegisterForm() {
       </div>
 
       <button type="submit" className="btn btn-primary btn-lg" disabled={isSubmitting}>
-        {isSubmitting ? 'Creazione in corso…' : 'Crea account'}
+        {isSubmitting ? 'Création en cours…' : 'Créer mon espace'}
       </button>
     </form>
   );
