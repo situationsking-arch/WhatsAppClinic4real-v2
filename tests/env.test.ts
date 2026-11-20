@@ -3,6 +3,17 @@ import { describe, expect, it } from 'vitest';
 import { parseEnv } from '@/lib/env';
 
 describe('parseEnv', () => {
+  it('uses the documented Tunisia deployment defaults', () => {
+    const parsed = parseEnv({ NODE_ENV: 'test' });
+
+    expect(parsed.LLM_PROVIDER).toBe('gemini');
+    expect(parsed.BOOKING_ENGINE).toBe('agent');
+    expect(parsed.LOCALE_PROFILE).toBe('tn');
+    expect(parsed.STT_PROVIDER).toBe('elevenlabs');
+    expect(parsed.WHATSAPP_PROVIDER_MODE).toBe('meta');
+    expect(parsed.WHATSAPP_GRAPH_API_VERSION).toBe('v26.0');
+  });
+
   it('keeps Anthropic model IDs unset unless configured', () => {
     const parsed = parseEnv({ NODE_ENV: 'test' });
 
