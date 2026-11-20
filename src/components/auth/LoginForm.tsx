@@ -7,7 +7,7 @@ export function LoginForm() {
   const { state, onSubmit } = useApiForm({
     endpoint: '/api/auth/magic-link',
     successMessage:
-      'Se l’indirizzo è associato a un account, riceverai un link di accesso entro pochi istanti. Controlla anche lo spam.',
+      'Si cette adresse est associée à un compte, vous recevrez un lien de connexion dans quelques instants. Vérifiez également vos courriers indésirables.',
   });
 
   return (
@@ -16,7 +16,7 @@ export function LoginForm() {
 
       <div className="field">
         <label htmlFor="email" className="label">
-          Email
+          Adresse e-mail
         </label>
         <input
           id="email"
@@ -25,13 +25,14 @@ export function LoginForm() {
           autoComplete="email"
           inputMode="email"
           required
-          placeholder="tu@studio.it"
+          maxLength={254}
+          placeholder="vous@entreprise.tn"
           className="input"
           aria-describedby="login-email-helper"
           disabled={state.status === 'submitting'}
         />
         <p className="helper" id="login-email-helper">
-          Ti invieremo un link sicuro che scade dopo 10 minuti.
+          Nous vous enverrons un lien sécurisé valable 10 minutes.
         </p>
       </div>
 
@@ -40,7 +41,7 @@ export function LoginForm() {
         className="btn btn-primary btn-lg"
         disabled={state.status === 'submitting'}
       >
-        {state.status === 'submitting' ? 'Invio in corso…' : 'Invia link di accesso'}
+        {state.status === 'submitting' ? 'Envoi en cours…' : 'Recevoir le lien de connexion'}
       </button>
     </form>
   );

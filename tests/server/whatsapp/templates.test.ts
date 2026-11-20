@@ -15,6 +15,8 @@ import type {
 } from '@/server/whatsapp/repository';
 
 const now = new Date('2026-04-25T10:00:00.000Z');
+const APPOINTMENT_REMINDER_TEMPLATE = 'appointment_reminder_24h';
+const APPOINTMENT_REMINDER_1H_TEMPLATE = 'appointment_reminder_1h';
 
 describe('WhatsAppTemplateMessageService', () => {
   it('enqueues approved appointment reminder templates', async () => {
@@ -31,7 +33,7 @@ describe('WhatsAppTemplateMessageService', () => {
       tenantId: 'tenant_1',
       conversationId: 'conversation_1',
       recipientIdentifier: '393331112233',
-      templateKey: 'appointment_reminder_24h',
+      templateKey: APPOINTMENT_REMINDER_TEMPLATE,
       idempotencyKey: 'appointment_123:reminder_24h',
       createdAt: now,
       variables: {
@@ -57,7 +59,7 @@ describe('WhatsAppTemplateMessageService', () => {
       content: 'Promemoria per Mario Rossi: appuntamento domani alle 10:00 presso Studio Ambrogio.',
       metadata: {
         source: 'whatsapp_template',
-        templateKey: 'appointment_reminder_24h',
+        templateKey: APPOINTMENT_REMINDER_TEMPLATE,
         templateId: 'template_1',
         appointmentId: 'appointment_123',
       },
@@ -151,7 +153,7 @@ describe('WhatsAppTemplateMessageService', () => {
       tenantId: 'tenant_1',
       conversationId: 'conversation_1',
       recipientIdentifier: '393331112233',
-      templateKey: 'appointment_reminder_1h',
+      templateKey: APPOINTMENT_REMINDER_1H_TEMPLATE,
       idempotencyKey: 'appointment_123:reminder_1h',
       variables: {
         customerName: 'Mario Rossi',

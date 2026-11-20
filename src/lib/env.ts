@@ -25,11 +25,11 @@ const envSchema = z.object({
   ANTHROPIC_MODEL_PRIMARY: z.string().optional().default(''),
   ANTHROPIC_MODEL_FAST: z.string().optional().default(''),
   /** Quale motore LLM usare per classificazione e risposte. Default: anthropic (comportamento originale). */
-  LLM_PROVIDER: z.enum(['anthropic', 'gemini']).default('anthropic'),
+  LLM_PROVIDER: z.enum(['anthropic', 'gemini']).default('gemini'),
   /** 'legacy' = macchina a stati italiana originale; 'agent' = agente Gemini (darija/francese/arabo). */
-  BOOKING_ENGINE: z.enum(['legacy', 'agent']).default('legacy'),
+  BOOKING_ENGINE: z.enum(['legacy', 'agent']).default('agent'),
   /** 'it' = testi fissi italiani originali; 'tn' = testi fissi francese/arabo per la Tunisia. */
-  LOCALE_PROFILE: z.enum(['it', 'tn']).default('it'),
+  LOCALE_PROFILE: z.enum(['it', 'tn']).default('tn'),
   GEMINI_API_KEY: z.string().optional().default(''),
   GEMINI_MODEL_PRIMARY: z.string().optional().default(''),
   GEMINI_MODEL_FAST: z.string().optional().default(''),
@@ -53,9 +53,9 @@ const envSchema = z.object({
   WHATSAPP_API_KEY: z.string().optional().default(''),
   WHATSAPP_API_URL: optionalUrl.default('https://waba-v2.360dialog.io'),
   /** '360dialog' (default, comportamento originale) oppure 'meta' (WhatsApp Cloud API diretta). */
-  WHATSAPP_PROVIDER_MODE: z.enum(['360dialog', 'meta']).default('360dialog'),
+  WHATSAPP_PROVIDER_MODE: z.enum(['360dialog', 'meta']).default('meta'),
   WHATSAPP_GRAPH_API_URL: optionalUrl.default('https://graph.facebook.com'),
-  WHATSAPP_GRAPH_API_VERSION: z.string().optional().default('v23.0'),
+  WHATSAPP_GRAPH_API_VERSION: z.string().optional().default('v26.0'),
   /** Solo modalita meta: phone_number_id usato quando il tenant non ne ha uno salvato. */
   WHATSAPP_PHONE_NUMBER_ID: z.string().optional().default(''),
   /** Solo modalita meta: ID del WhatsApp Business Account (serve per i template). */
