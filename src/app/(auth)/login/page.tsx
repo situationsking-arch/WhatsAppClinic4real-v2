@@ -4,21 +4,50 @@ import Link from 'next/link';
 import { LoginForm } from '@/components/auth/LoginForm';
 
 export const metadata: Metadata = {
-  title: 'Accedi · Ambrogio.ai',
-  description: 'Accedi al tuo account Ambrogio.ai',
+  title: 'Connexion · Ambrogio.ai',
+  description: 'Connectez-vous à votre espace Ambrogio.ai',
   robots: { index: false, follow: false },
 };
 
-export default function LoginPage() {
+const CALLBACK_ERRORS: Record<string, string> = {
+  link_non_valide:
+    'Ce lien de connexion est invalide ou a déjà expiré. Demandez un nouveau lien ci-dessous.',
+  link_incomplet:
+    'Le lien de connexion est incomplet. Demandez un nouveau lien pour continuer.',
+};
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const params = await searchParams;
+  const callbackError = params.error ? CALLBACK_ERRORS[params.error] : undefined;
+
   return (
     <div className="stack stack-6">
       <div className="stack stack-2">
-        <h1 style={{ fontSize: 'var(--text-3xl)' }}>Bentornato</h1>
+        <h1 style={{ fontSize: 'var(--text-3xl)' }}>Bon retour parmi nous</h1>
         <p className="muted">
-          Inserisci la tua email e ti mandiamo un link sicuro per accedere. Niente password da
-          ricordare.
+          Saisissez votre adresse e-mail. Nous vous enverrons un lien sécurisé pour vous connecter,
+          sans mot de passe.
         </p>
       </div>
+
+      {callbackError ? (
+        <p
+          role="alert"
+          style={{
+            padding: 'var(--space-3) var(--space-4)',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--color-danger-soft)',
+            color: 'var(--color-danger)',
+            fontSize: 'var(--text-sm)',
+          }}
+        >
+          {callbackError}
+        </p>
+      ) : null}
 
       <LoginForm />
 
@@ -30,19 +59,19 @@ export default function LoginPage() {
         }}
       >
         <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>
-          Non hai ancora un account?{' '}
+          Vous n’avez pas encore de compte ?{' '}
           <Link href="/register" className="btn-link">
-            Crea il tuo studio
+            Créer votre espace
           </Link>
         </p>
         <p className="muted" style={{ fontSize: 'var(--text-xs)' }}>
-          Cliccando su &quot;Invia link&quot; accetti i{' '}
+          En cliquant sur « Recevoir le lien », vous acceptez les{' '}
           <Link href="/legal/terms" className="btn-link">
-            termini di servizio
+            conditions d’utilisation
           </Link>{' '}
-          e la{' '}
+          et la{' '}
           <Link href="/legal/privacy" className="btn-link">
-            privacy policy
+            politique de confidentialité
           </Link>
           .
         </p>
